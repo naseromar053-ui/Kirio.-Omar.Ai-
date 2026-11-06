@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة عمر - حل مسائل البرمجة</title>
+    <!-- مكتبة OCR لاستخراج النص من الصور مجاناً -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- خطوط إنجليزية عريضة وأنيقة -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #050b14;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* حاوية تأثير المياه المتدفقة والاسم المشع */
+        .header-container {
+            position: relative;
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+
+        /* تأثير سيل المياه الوهمي فوق الاسم */
+        .water-stream {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(0, 195, 255, 0), #00d2ff, #0051ff);
+            border-radius: 50%;
+            animation: pourWater 1.5s infinite ease-in-out;
+            box-shadow: 0 0 15px #00d2ff;
+        }
+
+        @keyframes pourWater {
+            0% { transform: translateX(-50%) translateY(-20px); opacity: 0; height: 10px; }
+            50% { opacity: 1; height: 50px; }
+            100% { transform: translateX(-50%) translateY(30px); opacity: 0; height: 10px; }
+        }
+
+        /* تصميم اسم عمر بخط إنجليزي عريض ومشبع بلون المياه النيون */
+        .glow-title {
+            font-family: 'Orbitron', 'Cinzel', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #e0f7ff;
+            text-transform: uppercase;
+            text-shadow: 
+                0 0 5px #00d2ff,
+                0 0 10px #00d2ff,
+                0 0 20px #0077ff,
+                0 0 40px #0051ff,
+                0 0 80px #0033aa;
+            animation: waterGlow 3s infinite alternate ease-in-out;
+            margin: 10px 0 0 0;
+        }
+
+        @keyframes waterGlow {
+            0% {
+                text-shadow: 0 0 5px #00d2ff, 0 0 10px #00d2ff, 0 0 20px #0077ff, 0 0 40px #0051ff;
+                transform: scale(1);
+            }
+            100% {
+                text-shadow: 0 0 10px #6ef3ff, 0 0 20px #00d2ff, 0 0 30px #0099ff, 0 0 60px #0044cc, 0 0 100px #002288;
+                transform: scale(1.02);
+            }
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #7abaff;
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* صندوق الموقع الأساسي */
+        .box {
+            background: rgba(11, 20, 38, 0.85);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 25px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 110, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: block;
+            background: linear-gradient(135deg, #0077ff, #00d2ff);
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 150, 255, 0.4);
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .custom-file-upload:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 150, 255, 0.6);
+        }
+
+        button.action-btn {
+            background: #00ffcc;
+            color: #050b14;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        button.action-btn:hover {
+            background: #00ccaa;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+        }
+
+        #status {
+            margin-top: 15px;
+            color: #7abaff;
+            font-size: 14px;
+        }
+
+        #output {
+            display: none;
+            text-align: right;
+            margin-top: 20px;
+            border-top: 1px solid rgba(0, 210, 255, 0.2);
+            padding-top: 15px;
+        }
+
+        .result-card {
+            background: rgba(5, 11, 20, 0.6);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .result-card a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .result-card a:hover {
+            text-decoration: underline;
+        }
+
+        .result-card p {
+            color: #a5c7ff;
+            font-size: 13px;
+            margin: 5px 0 0 0;
+        }
+
+        .source-tag {
+            display: inline-block;
+            background: #0033aa;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <!-- خط قطرات المياه المتدفقة -->
+    <div class="water-stream"></div>
+    <!-- الاسم المشع بلون المياه -->
+    <h1 class="glow-title">OMAR</h1>
+    <div class="subtitle">AI Code & Problem Solver</div>
+</div>
+
+<div class="box">
+    <label for="imageInput" class="custom-file-upload">
+        📸 التقاط أو اختيار صورة المسألة البرمجية
+    </label>
+    <input type="file" id="imageInput" accept="image/*" capture="environment" onchange="showFileName()">
+    
+    <div id="fileName" style="font-size: 13px; color: #00ffcc; margin-bottom: 10px; display: none;"></div>
+    
+    <button class="action-btn" onclick="processImage()">حل المسألة الآن</button>
+
+    <div id="status"></div>
+
+    <div id="output">
+        <h3 style="color: #00d2ff; font-size: 16px;">📝 النص المستخرج:</h3>
+        <p id="extractedText" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #e0f7ff; direction: ltr; text-align: left;"></p>
+        
+        <h3 style="color: #00d2ff; font-size: 16px; margin-top: 15px;">💡 الحلول المجمعة من كل محركات البحث:</h3>
+        <div id="solutions"></div>
+    </div>
+</div>
+
+<script>
+function showFileName() {
+    const input = document.getElementById('imageInput');
+    const nameDiv = document.getElementById('fileName');
+    if (input.files[0]) {
+        nameDiv.style.display = 'block';
+        nameDiv.innerText = "تم اختيار الملف: " + input.files[0].name;
+    }
+}
+
+async function processImage() {
+    const fileInput = document.getElementById('imageInput');
+    const status = document.getElementById('status');
+    const output = document.getElementById('output');
+    
+    if (!fileInput.files[0]) {
+        alert("يرجى التقاط صورة أو اختيار ملف أولاً!");
+        return;
+    }
+
+    status.innerText = "⏳ جاري قراءة الكود أو السؤال من الصورة (OCR)...";
+    output.style.display = 'none';
+    
+    try {
+        // 1. استخراج النص باستخدام Tesseract.js
+        const worker = await Tesseract.createWorker('eng');
+        const ret = await worker.recognize(fileInput.files[0]);
+        const questionText = ret.data.text.trim();
+        await worker.terminate();
+
+        if (!questionText) {
+            status.innerText = "❌ لم نتمكن من قراءة أي نص، يرجى اختيار صورة أوضح.";
+            return;
+        }
+
+        document.getElementById('extractedText').innerText = questionText;
+        status.innerText = "🔍 جاري البحث في كافة محركات البحث العالمية عن الحل...";
+
+        // 2. إرسال النص للخادم للبحث الشامل
+        const response = await fetch('/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: questionText })
+        });
+        
+        const data = await response.json();
+        
+        let html = '';
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(res => {
+                html += `
+                    <div class="result-card">
+                        <span class="source-tag">${res.source}</span>
+                        <br>
+                        <a href="${res.url}" target="_blank">${res.title}</a>
+                        <p>${res.snippet}</p>
+                    </div>
+                `;
+            });
+            status.innerText = `✅ تم العثور على (${data.count}) نتيجة بنجاح!`;
+        } else {
+            html = "<p style='color: #ff9999;'>لم يتم العثور على نتائج مطابقة، جرب صورة أخرى أو وضح السؤال.</p>";
+            status.innerText = "⚠️ اكتمل البحث.";
+        }
+        
+        document.getElementById('solutions').innerHTML = html;
+        output.style.display = 'block';
+
+    } catch (err) {
+        console.error(err);
+        status.innerText = "❌ حدث خطأ أثناء المعالجة أو الاتصال بالسيرفر.";
+    }
+}
+</script>
+</body>
+</html>
